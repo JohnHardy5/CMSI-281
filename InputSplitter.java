@@ -2,8 +2,6 @@
  * Group members: John Hardy, Albert Didde, and Ryan Frizel.
  */
 
-package testing;
-
 import java.util.Scanner;
 
 public class InputSplitter {
@@ -28,9 +26,11 @@ public class InputSplitter {
 			}
 		}
 		boolean foundIndividual = false;
+		int numIndvWordsFound = 0;
 		for (int i = 0; i != words.length; i++) {
 			if (words[i] != null) {
 				System.out.println(words[i]);
+				numIndvWordsFound++;
 				foundIndividual = true;
 			}
 		}
@@ -39,5 +39,6 @@ public class InputSplitter {
 		} else {
 			System.out.println("No individual words found...");
 		}
+		System.out.println("Number of individual words found: " + numIndvWordsFound);
 	}
 }
