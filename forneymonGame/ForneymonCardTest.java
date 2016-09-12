@@ -15,4 +15,19 @@ public class ForneymonCardTest {
         //"?: ?"
         System.out.println(burny);
     }
+	
+	@Test
+	public void matchTest () {
+		FlippingForneymonCard dampy = new FlippingForneymonCard("dampy", "Dampymon", true);
+		FlippingForneymonCard leafy = new FlippingForneymonCard("leafy", "Leafymon", false);
+		assertEquals(dampy.match(leafy), 2);
+		dampy.flip();
+		assertEquals(dampy.match(leafy), 0);
+		
+		FlippingForneymonCard dampy2 = new FlippingForneymonCard("dampy", "Dampymon", false);
+		assertEquals(dampy.match(dampy2), 1);
+		
+		FlippingForneymonCard dampy3 = new FlippingForneymonCard("dimpy", "Dampymon", false);
+		assertEquals(dampy.match(dampy3), 0);
+	}
 }

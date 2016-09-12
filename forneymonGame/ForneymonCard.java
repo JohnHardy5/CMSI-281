@@ -3,7 +3,7 @@ package forneymonGame;
  * Written by John Hardy
  */
 
-public class ForneymonCard {
+public abstract class ForneymonCard {
 	private String name;
 	private String type;
 	
