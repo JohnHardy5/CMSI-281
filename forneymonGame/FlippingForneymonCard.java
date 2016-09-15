@@ -8,7 +8,7 @@ public class FlippingForneymonCard extends ForneymonCard {
 	
 	FlippingForneymonCard (String name, String type, boolean isFD) {
 		super(name, type);
-		isFaceDown = isFD | false;//Will default to faceUp if no input is given.
+		isFaceDown = isFD;
 	}
 	
 	public boolean getIsFaceDown() {
@@ -20,16 +20,14 @@ public class FlippingForneymonCard extends ForneymonCard {
 		return isFaceDown;
 	}
 	
-	public int match (FlippingForneymonCard other) {
-		int value = 3;
+	public int match(FlippingForneymonCard other) {
 		if (isFaceDown || other.getIsFaceDown()) {
-			value = 2;
-		} else if ((!isFaceDown && !other.getIsFaceDown()) && (this.getName().equals(other.getName())) && (this.getType().equals(other.getType()))) {
-			value = 1;
-		} else if ((!isFaceDown && !other.getIsFaceDown()) && ((!this.getName().equals(other.getName())) || (!this.getType().equals(other.getType())))) {
-			value = 0;
+			return 2;
+		} else if (super.getName().equals(other.getName()) && (super.getType().equals(other.getType()))) {
+			return 1;
+		} else {
+			return 0;
 		}
-		return value;
 	}
 	
 	public String toString() {

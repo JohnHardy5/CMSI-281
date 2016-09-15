@@ -1,5 +1,7 @@
 package forneymonGame;
-
+/*
+ * Written by John Hardy
+ */
 import static org.junit.Assert.*;
 
 import org.junit.Test;
