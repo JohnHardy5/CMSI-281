@@ -1,4 +1,7 @@
 package yarn;
+/*
+ *Written by John Hardy and Eddy
+ */
 
 public class Yarn implements YarnInterface {
 
