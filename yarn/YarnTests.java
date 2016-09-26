@@ -9,6 +9,7 @@ public class YarnTests {
     @Test
     public void testYarn() {
         Yarn ball = new Yarn();
+        assertEquals(0, ball.count("hello"));
     }
 
     @Test
@@ -17,6 +18,8 @@ public class YarnTests {
         assertTrue(ball.isEmpty());
         ball.insert("not_empty");
         assertFalse(ball.isEmpty());
+        ball.remove("not_empty");
+        assertTrue(ball.isEmpty());
     }
 
     @Test
@@ -27,6 +30,18 @@ public class YarnTests {
         assertEquals(ball.getSize(), 2);
         ball.insert("unique");
         assertEquals(ball.getSize(), 3);
+        ball.insert("immature_noise");
+        ball.insert("lewd_sounds");
+        ball.remove("dup");
+        assertEquals(4, ball.getSize());
+        
+        Yarn bigBall = new Yarn();
+        for (int i = 0; i < 99; i++) {
+        	bigBall.insert("im_a_string!");
+        }
+        assertEquals(99, bigBall.getSize());
+        bigBall.insert("im_also_a_string!!");
+        assertEquals(100, bigBall.getSize());
     }
 
     @Test
@@ -37,6 +52,9 @@ public class YarnTests {
         assertEquals(ball.getUniqueSize(), 1);
         ball.insert("unique");
         assertEquals(ball.getUniqueSize(), 2);
+        ball.insert("dup");
+        ball.remove("unique");
+        assertEquals(1, ball.getUniqueSize());
     }
 
     @Test

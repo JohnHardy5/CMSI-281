@@ -25,6 +25,18 @@ public class intList {
 		return items[index];
 	}
 	
+	public int getSize () {
+		return size;
+	}
+	
+	public String toString () {
+		String result = "";
+		for (int i = 0; i < size; i++) {
+			result = result + ", " + items[i];
+		}
+		return result;
+	}
+	
 	public void removeAt (int index) {
 		shiftLeft(index);
 		size--;
