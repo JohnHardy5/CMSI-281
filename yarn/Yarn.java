@@ -1,6 +1,6 @@
 package yarn;
 /*
- *Written by John Hardy
+ *Completed by John Hardy
  */
 
 public class Yarn implements YarnInterface {
@@ -56,7 +56,6 @@ public class Yarn implements YarnInterface {
     
     public int remove (String toRemove) {
     	int toRemoveFrom = findFirstString(toRemove);
-    	//System.out.println(toRemoveFrom);
     	if (toRemoveFrom > -1) {
     		items[toRemoveFrom].count--;
     		size--;
@@ -175,20 +174,23 @@ public class Yarn implements YarnInterface {
     // Private helper methods
     // -----------------------------------------------------------
     
+    /*
+     * Destroys the entry at given location in items[] by overwriting it with the last item 
+     * and setting the last item to null.
+     */
     private void destroyObject (int objToDestroy) {
 		items[objToDestroy] = items[uniqueSize - 1];
 		items[uniqueSize - 1] = null;
 		uniqueSize--;
     }
+    
     /*
-     * Returns location of first string found in array equal to string given.
+     * Returns location of first string found in items[] equal to string given.
      * Returns -1 if no string is found.
      */
     private int findFirstString (String toFind) {;
     	for (int i = 0; i < uniqueSize; i++) {
-    		//System.out.println(uniqueSize + " " + items[i].text.equals(toFind));
     		if (items[i].text.equals(toFind)) {
-    			//System.out.println("Going to return i!");
     			return i;
     		}
     	}
