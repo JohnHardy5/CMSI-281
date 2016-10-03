@@ -308,6 +308,19 @@ public class YarnTests {
         assertFalse(y1.contains("test"));
         assertFalse(y2.contains("test"));
         
+        Yarn differentYarn = new Yarn();
+        differentYarn.insert("different");
+        differentYarn.insert("difference");
+        
+        Yarn sameYarn = new Yarn();
+        sameYarn.insert("different");
+        sameYarn.insert("difference");
+        
+        Yarn tornYarn = Yarn.tear(differentYarn, sameYarn);
+        assertFalse(tornYarn.contains("different"));
+        assertFalse(tornYarn.contains("difference"));
+        
+        
         Yarn catchTwentyTwo = new Yarn();
         catchTwentyTwo.insert("Yossarian");
         catchTwentyTwo.insert("Orr");
