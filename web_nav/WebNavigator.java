@@ -1,26 +1,22 @@
 package web_nav;
 	
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Scanner;
 	
 public class WebNavigator {
 	
 	 // Fields
 	private String current; // Tracks currently visited site
-	private LinkedList<String> webHistory;
+	private ArrayList<String> webHistory;
 	private int size;
-	private String head;
-	 // TODO: You choose the fields!
-	 // Any you want to add! Keep them private!
-	 // ???
+	private int currentItem;
 	 
 	 // Constructor
 	WebNavigator () {
-	     // TODO: Initialize your new fields in constructor
-		webHistory = new LinkedList<String>();
-	     current = null;
-	     size = 0;
-	     head = null;
+	    current = null;
+		webHistory = new ArrayList<String>();
+	    size = 0;
+	    currentItem = -1;
 	 }
 	 
 	 // Methods
@@ -32,7 +28,6 @@ public class WebNavigator {
         // Switch on the command (issued first in input line)
         switch(parsedCommand[0]) {
         case "exit":
-            System.out.println("Goodbye!");
             return false;
         case "visit":
             visit(parsedCommand[1]);
@@ -57,8 +52,14 @@ public class WebNavigator {
 	  *  and records the visited site in the back history
 	  */
 	public void visit (String site) {
-	     // TODO
-	 // ???
+		while (currentItem < size - 1 && size > 1) {
+			webHistory.remove(currentItem + 1);
+			size--;
+		}
+		current = site;
+		webHistory.add(current);
+		size++;
+		currentItem++;
 	}
 	 
 	 /*
@@ -66,13 +67,15 @@ public class WebNavigator {
 	  *  visited in the order on which visit was called on it
 	  */
 	public void back () {
-	     // TODO
-	 // ???
+		if (size < 2 || currentItem == 0) {return;}
+		currentItem--;
+		current = webHistory.get(currentItem);
 	}
 	 
 	public void forw () {
-	     // TODO
-	 // ???
+		if (currentItem == size - 1) {return;}
+		currentItem++;
+		current = webHistory.get(currentItem);
 	}
 	 
 	public static void main(String[] args) {
