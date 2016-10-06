@@ -8,14 +8,12 @@ public class WebNavigator {
 	 // Fields
 	private String current; // Tracks currently visited site
 	private ArrayList<String> webHistory;
-	private int size;
 	private int currentItem;
 	 
 	 // Constructor
 	WebNavigator () {
 	    current = null;
 		webHistory = new ArrayList<String>();
-	    size = 0;
 	    currentItem = -1;
 	 }
 	 
@@ -52,13 +50,11 @@ public class WebNavigator {
 	  *  and records the visited site in the back history
 	  */
 	public void visit (String site) {
-		while (currentItem < size - 1 && size > 1) {
+		while (currentItem < webHistory.size() - 1) {
 			webHistory.remove(currentItem + 1);
-			size--;
 		}
 		current = site;
 		webHistory.add(current);
-		size++;
 		currentItem++;
 	}
 	 
@@ -67,15 +63,24 @@ public class WebNavigator {
 	  *  visited in the order on which visit was called on it
 	  */
 	public void back () {
-		if (size < 2 || currentItem == 0) {return;}
+		if (currentItem < 1) {return;}
 		currentItem--;
 		current = webHistory.get(currentItem);
 	}
 	 
 	public void forw () {
-		if (currentItem == size - 1) {return;}
+		if (currentItem == webHistory.size() - 1) {return;}
 		currentItem++;
 		current = webHistory.get(currentItem);
+	}
+	
+	//getters
+	public String getCurrent() {
+		return current;
+	}
+	
+	public int getCurrentItem() {
+		return currentItem;
 	}
 	 
 	public static void main(String[] args) {
