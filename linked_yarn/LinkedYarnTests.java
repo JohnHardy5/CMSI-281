@@ -87,7 +87,7 @@ public class LinkedYarnTests {
         assertEquals(1, ball.getSize());
         assertEquals(1, ball.getUniqueSize());
         assertEquals(1, dups);
-        System.out.println("Done with remove tests.");
+        //System.out.println("Done with remove tests.");
     }
 
     @Test
@@ -147,12 +147,24 @@ public class LinkedYarnTests {
         LinkedYarn.Iterator it = ball.getIterator();
 
         // Test next()
+        //System.out.println("Testing ball.clone()");
         LinkedYarn dolly = ball.clone();
+        //System.out.println("Ball info: " + ball.isEmpty() + " " + ball.getSize() + " " + ball.getUniqueSize());
+       // System.out.println("Dolly info: " + dolly.isEmpty() + " " + dolly.getSize() + " " + dolly.getUniqueSize());
+        //System.out.println("Dolly contains null? " + dolly.contains(null));
+        //System.out.println("Dolly contains b? " + dolly.contains("b"));
+        //System.out.println("Dolly contains a? " + dolly.contains("a"));
         while (true) {
+            //System.out.println("it.getString(): " + it.getString());
             String gotten = it.getString();
             assertTrue(dolly.contains(gotten));
+            System.out.println("Gotten: " + gotten);
             dolly.remove(gotten);
-            if (it.hasNext()) {it.next();} else {break;}
+            if (it.hasNext()) {
+            	it.next();
+            } else {
+            	break;
+            }
         }
         assertTrue(dolly.isEmpty());
         assertFalse(it.hasNext());
@@ -181,6 +193,7 @@ public class LinkedYarnTests {
     // -------------------------------------------------
     @Test
     public void testClone() {
+    	//System.out.println("Starting other tests");
         ball.insert("dup");
         ball.insert("dup");
         ball.insert("unique");
@@ -203,6 +216,7 @@ public class LinkedYarnTests {
         y1.swap(y2);
         assertTrue(y1.contains("yo"));
         assertTrue(y1.contains("sup"));
+        //System.out.println(y2.getUniqueSize());
         assertTrue(y2.contains("dup"));
         assertTrue(y2.contains("unique"));
         assertFalse(y1.contains("dup"));

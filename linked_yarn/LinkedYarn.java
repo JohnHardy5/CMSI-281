@@ -15,7 +15,6 @@ public class LinkedYarn implements LinkedYarnInterface {
     // Constructor
     // -----------------------------------------------------------
     LinkedYarn () {
-    	head = new Node(null, 0);
         size = 0;
         uniqueSize = 0;
         modCount = 0;
@@ -26,7 +25,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     // Methods
     // -----------------------------------------------------------
     public boolean isEmpty () {
-        return head.next == null;
+        return head == null;
     }
     
     public int getSize () {
@@ -41,10 +40,11 @@ public class LinkedYarn implements LinkedYarnInterface {
     	Node nodeToAddTo = findFirstNodeWith(toAdd);
     	if (nodeToAddTo != null) {
     		nodeToAddTo.count++;
-    		size++;
     	} else {
-    		createNode(toAdd);
+    		createNode(toAdd, 1, this);
+        	uniqueSize++;
     	}
+		size++;
         modCount++;
     }
     
@@ -85,6 +85,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     }
     
     public boolean contains (String toCheck) {
+    	//ystem.out.println(toCheck);
     	return findFirstNodeWith(toCheck) != null;
     }
     
@@ -92,7 +93,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     	if (isEmpty()) {return null;}
     	String mostCommon = null;
     	int mostCommonCount = 0;
-        LinkedYarn.Iterator it = getIterator();
+        Iterator it = getIterator();
         while (it.hasNext()) {
         	it.next();
         	if (it.current.count > mostCommonCount) {
@@ -104,11 +105,31 @@ public class LinkedYarn implements LinkedYarnInterface {
     }
     
     public LinkedYarn clone () {
-        throw new UnsupportedOperationException();
+        LinkedYarn linkYarnClone = new LinkedYarn();
+        linkYarnClone.size = size;
+        linkYarnClone.uniqueSize = uniqueSize;
+        linkYarnClone.modCount = modCount;
+        Iterator it = getIterator();
+        for (int i = 0; i < uniqueSize; i++) {
+        	//System.out.println("Creating new node with: " + it.getString() + " " + it.current.count);
+        	createNode(it.getString(), it.current.count, linkYarnClone);
+        	if (it.current.next != null) {
+        		it.current = it.current.next;
+        	}
+        }
+        return linkYarnClone;
     }
     
     public void swap (LinkedYarn other) {
-        throw new UnsupportedOperationException();
+        other.modCount++;
+        modCount++;
+        //System.out.println("other: " + other.head);
+       // System.out.println("this: " + head);
+        Node originalHead = head;
+        head = other.head;
+        other.head = originalHead;
+        //System.out.println("other: " + other.head);
+        //System.out.println("this: " + head);
     }
     
     public LinkedYarn.Iterator getIterator () {
@@ -124,15 +145,36 @@ public class LinkedYarn implements LinkedYarnInterface {
     // -----------------------------------------------------------
     
     public static LinkedYarn knit (LinkedYarn y1, LinkedYarn y2) {
-        throw new UnsupportedOperationException();
+    	LinkedYarn.Iterator it = y1.getIterator();
+        for (int i = 0; i < y1.getSize(); i++) {
+        	y2.insert(it.getString());
+        	it.next();
+        }
+        return y2.clone();
     }
     
     public static LinkedYarn tear (LinkedYarn y1, LinkedYarn y2) {
-        throw new UnsupportedOperationException();
+    	LinkedYarn y3 = y1.clone();
+    	LinkedYarn.Iterator it = y3.getIterator();
+    	for (int i = 0; i < y3.getSize(); i++) {
+    		if (y2.contains(it.getString())) {
+    			y3.remove(it.getString());
+    		}
+    		it.next();
+    	}
+    	return y3;
     }
     
     public static boolean sameYarn (LinkedYarn y1, LinkedYarn y2) {
-        throw new UnsupportedOperationException();
+    	if (y1.size != y2.size || y1.uniqueSize != y2.uniqueSize) {return false;}
+        LinkedYarn.Iterator it = y1.getIterator();
+        for (int i = 0; i < y1.getSize(); i++) {
+        	if (!y2.contains(it.getString()) || y2.count(it.getString()) != it.current.count) {
+        		return false;
+        	}
+        	it.next();
+        }
+        return true;
     }
     
     
@@ -140,25 +182,36 @@ public class LinkedYarn implements LinkedYarnInterface {
     // Private helper methods
     // -----------------------------------------------------------
     
-    //Creates a new node and updates all the next and prev values appropriately.
-    private void createNode (String textToAdd) {
-    	Node n = new Node(textToAdd, 1);
-    	n.next = head.next;
-    	if (head.next != null) {
-    		head.next.prev = n;
+    //Adds a new node to the given LinkedYarn and updates all the next and prev values appropriately.
+    private void createNode (String textToAdd, int countToAdd, LinkedYarn yarnToAddTo) {
+    	Node n = new Node(textToAdd, countToAdd);
+    	//System.out.println("Created node with; " + n.text + " " + n.count)
+    	if (yarnToAddTo.head != null) {;
+    		//System.out.println("N is : " + n);
+    		//System.out.println("Yarn head is: " + yarnToAddTo.head);
+    		//System.out.println("Yarn.head is: " + yarnToAddTo.head);
+    		n.next = yarnToAddTo.head;
+    		yarnToAddTo.head.prev = n;
+    		//System.out.println("Yarn.head.prev is: " + yarnToAddTo.head.prev);
+    		//System.out.println("Swapping positions of n and another node.");
     	}
-    	head.next = n;
-    	size++;
-    	uniqueSize++;
+    	yarnToAddTo.head = n;
+    	//System.out.println("N is: " + n);
+    	//System.out.println("head is: " + yarnToAddTo.head);
     }
     
     //Searches this linked list for a given string, returning the node with the string or null otherwise.
     private Node findFirstNodeWith(String toFind) {
-        LinkedYarn.Iterator it = getIterator();
-        while(it.hasNext()) {
-        	it.next();
-        	if (it.current.text == toFind) {
+    	if (isEmpty()) {
+    		return null;
+    		}
+        Iterator it = getIterator();
+        for (int i = 0; i < size; i++) {
+        	if (it.getString() == toFind) {
         		return it.current;
+        	}
+        	if (it.hasNext()) {
+        		it.next();
         	}
         }
     	return null;
@@ -167,7 +220,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     //Destroys given node by removing all references to it and fixing any gaps left behind.
     private void destroyNode(Node toDestroy) {
     	if (toDestroy.prev == null) {
-    		head.next = toDestroy.next;
+    		head = toDestroy.next;
     	} else {
     		toDestroy.prev.next = toDestroy.next;
     	}
@@ -178,7 +231,6 @@ public class LinkedYarn implements LinkedYarnInterface {
     	toDestroy.prev = null;
     	uniqueSize--;
     }
-    
     
     // -----------------------------------------------------------
     // Inner Classes
@@ -191,7 +243,7 @@ public class LinkedYarn implements LinkedYarnInterface {
         
         Iterator (LinkedYarn y) {
             owner = y;
-            current = y.head;
+            current = owner.head;
             itModCount = owner.modCount;
             currCount = 0;
         }
