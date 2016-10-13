@@ -22,6 +22,7 @@ public class YarnTests {
         assertTrue(ball.isEmpty());
         ball.insert("not_empty");
         assertFalse(ball.isEmpty());
+        
         ball.remove("not_empty");
         assertTrue(ball.isEmpty());
     }
@@ -34,6 +35,7 @@ public class YarnTests {
         assertEquals(ball.getSize(), 2);
         ball.insert("unique");
         assertEquals(ball.getSize(), 3);
+        
         ball.insert("immature_noises");
         ball.insert("lewd_sounds");
         ball.remove("dup");
@@ -56,6 +58,7 @@ public class YarnTests {
         assertEquals(ball.getUniqueSize(), 1);
         ball.insert("unique");
         assertEquals(ball.getUniqueSize(), 2);
+        
         ball.insert("dup");
         ball.remove("unique");
         assertEquals(1, ball.getUniqueSize());
@@ -141,7 +144,6 @@ public class YarnTests {
         assertEquals(1, itIsTwelveAm.count("why_Did_I_Procrastinate?0"));
         itIsTwelveAm.insert("i_Hate_Myself");
         assertEquals(0, itIsTwelveAm.count("i_Hate_Myself"));
-        
     }
 
     @Test
