@@ -57,9 +57,11 @@ public class LinkedYarnTests {
         assertTrue(ball.isEmpty());
     }
 
-    @Test//TODO: Place holder
+    @Test
     public void testGetSize() {
+    	assertEquals(0, ball.getSize());
         ball.insert("dup");
+    	assertEquals(1, ball.getSize());
         ball.insert("dup");
         assertEquals(2, ball.getSize());
         ball.insert("unique");
@@ -81,6 +83,7 @@ public class LinkedYarnTests {
 
     @Test
     public void testGetUniqueSize() {
+    	assertEquals(0, ball.getUniqueSize());
         ball.insert("dup");
         ball.insert("dup");
         assertEquals(1, ball.getUniqueSize());
@@ -97,7 +100,7 @@ public class LinkedYarnTests {
         	ballsOfSteel.insert(stringy + Integer.toString(i));
         }
         assertEquals(100, ballsOfSteel.getUniqueSize());
-        ballsOfSteel.insert("i_will_get_inserted_:(");
+        ballsOfSteel.insert("i_will_get_inserted");
         assertEquals(101, ballsOfSteel.getUniqueSize());
     }
 
@@ -105,11 +108,16 @@ public class LinkedYarnTests {
     // -------------------------------------------------
     @Test
     public void testInsert() {
+    	assertFalse(ball.contains("dup"));
+    	
         ball.insert("dup");
         ball.insert("dup");
         ball.insert("unique");
         assertTrue(ball.contains("dup"));
         assertTrue(ball.contains("unique"));
+        
+        assertEquals(2, ball.count("dup"));
+        assertFalse(ball.contains(null));
         
         LinkedYarn specialYarn = ball.clone();
         specialYarn.insert("im_special!");
@@ -118,13 +126,20 @@ public class LinkedYarnTests {
         LinkedYarn meanYarn = LinkedYarn.tear(specialYarn, ball);
         assertTrue(meanYarn.contains("im_special!"));
         assertFalse(meanYarn.contains("unique"));
+        
+        LinkedYarn bigBall = new LinkedYarn();
+        for (int i = 0; i < 100; i++) {
+        	bigBall.insert("hello");
+        }
+        assertEquals(100, bigBall.getSize());
+        assertEquals(1, bigBall.getUniqueSize());
     }
 
     @Test
     public void testRemove() {
-    	//System.out.println("Starting remove tests.");
+    	assertEquals(0, ball.remove("dup"));
+    	
         ball.insert("dup");
-        //System.out.println("About to insert another dup.");
         ball.insert("dup");
         assertEquals(2, ball.getSize());
         assertEquals(1, ball.getUniqueSize());
@@ -132,7 +147,6 @@ public class LinkedYarnTests {
         assertEquals(1, ball.getSize());
         assertEquals(1, ball.getUniqueSize());
         assertEquals(1, dups);
-        //System.out.println("Done with remove tests.");
         
         LinkedYarn betterThanFornsYarn = ball.clone();
         betterThanFornsYarn.remove("dup");
@@ -155,10 +169,19 @@ public class LinkedYarnTests {
         iHateYarns.removeAll("");
         assertEquals(0, iHateYarns.getSize());
         assertEquals(0, iHateYarns.getUniqueSize());
+        
+        for (int i = 0; i < 100; i++) {
+        	iHateYarns.insert("I_HATE_LINKED_YARNS");
+        }
+        iHateYarns.removeAll("I_HATE_LINKED_YARNS");
+        assertEquals(0, iHateYarns.getSize());
+        assertEquals(0, iHateYarns.getUniqueSize());
     }
 
     @Test
     public void testCount() {
+    	assertEquals(0, ball.count("dup"));
+    	
         ball.insert("dup");
         ball.insert("dup");
         ball.insert("unique");
@@ -178,6 +201,9 @@ public class LinkedYarnTests {
 
     @Test
     public void testContains() {
+    	assertFalse(ball.contains("dup"));
+        assertFalse(ball.contains(null));
+    	
         ball.insert("dup");
         ball.insert("dup");
         ball.insert("unique");
@@ -193,8 +219,6 @@ public class LinkedYarnTests {
         assertTrue(crazyYarn.contains("alkjsdlgkhapksdjgh0"));
         crazyYarn.insert("asldfh");
         assertTrue(crazyYarn.contains("asldfh"));
-        
-        assertFalse(ball.contains(null));
     }
     // This is tested pretty much everywhere so...
 
@@ -212,6 +236,16 @@ public class LinkedYarnTests {
 
         LinkedYarn emptyYarn = new LinkedYarn();
         assertEquals(null, emptyYarn.getMostCommon());
+
+        LinkedYarn bigBall = new LinkedYarn();
+        for (int i = 0; i < 50; i++) {
+        	bigBall.insert("hello");
+        	if (i < 25) {
+        		bigBall.insert("hello!");
+        	}
+        }
+        bigBall.insert("hi");
+        assertEquals("hello", bigBall.getMostCommon());
     }
 
     // Iterator Tests
@@ -225,17 +259,9 @@ public class LinkedYarnTests {
         LinkedYarn.Iterator it = ball.getIterator();
 
         // Test next()
-        //System.out.println("Testing ball.clone()");
         LinkedYarn dolly = ball.clone();
-        //System.out.println("Ball info: Is empty? " + ball.isEmpty() + " Size: " + ball.getSize() + " uniqueSize: " + ball.getUniqueSize());
-        //System.out.println(ball);
-        //System.out.println("Dolly info: Is empty? " + dolly.isEmpty() + " Size: " + dolly.getSize() + " uniqueSize: " + dolly.getUniqueSize());
-        //System.out.println(dolly);
         while (true) {
-            //System.out.println("it.getString(): " + it.getString());
-            //System.out.println(dolly);
             String gotten = it.getString();
-            //System.out.println("Gotten: " + gotten);
             assertTrue(dolly.contains(gotten));
             dolly.remove(gotten);
             if (it.hasNext()) {
@@ -244,9 +270,9 @@ public class LinkedYarnTests {
             	break;
             }
         }
-        //System.out.println(dolly);
         assertTrue(dolly.isEmpty());
         assertFalse(it.hasNext());
+        assertEquals(2, ball.getUniqueSize());
         
         // Test prev()
         dolly = ball.clone();
@@ -254,10 +280,15 @@ public class LinkedYarnTests {
             String gotten = it.getString();
             assertTrue(dolly.contains(gotten));
             dolly.remove(gotten);
-            if (it.hasPrev()) {it.prev();} else {break;}
+            if (it.hasPrev()) {
+            	it.prev();
+            } else {
+            	break;
+            }
         }
         assertTrue(dolly.isEmpty());
         assertFalse(it.hasPrev());
+        assertEquals(2, ball.getUniqueSize());
         
         int countOfReplaced = ball.count(it.getString());
         it.replaceAll("replaced!");
@@ -272,7 +303,9 @@ public class LinkedYarnTests {
     // -------------------------------------------------
     @Test
     public void testClone() {
-    	//System.out.println("Starting other tests");
+    	LinkedYarn emptyYarn = ball.clone();
+    	assertEquals(0, emptyYarn.getSize());
+    	
         ball.insert("dup");
         ball.insert("dup");
         ball.insert("unique");
@@ -282,6 +315,7 @@ public class LinkedYarnTests {
         dolly.insert("cool");
         assertFalse(ball.contains("cool"));
         
+        //This is designed to ensure that all three methods work, mainly clone.
         LinkedYarn yingYangYarn = LinkedYarn.knit(LinkedYarn.tear(dolly.clone(), ball.clone()), ball.clone());
         assertTrue(yingYangYarn.contains("cool"));
         assertEquals(2, yingYangYarn.count("dup"));
@@ -289,6 +323,12 @@ public class LinkedYarnTests {
 
     @Test
     public void testSwap() {
+    	LinkedYarn emptyYarn = ball.clone();
+    	ball.insert("dup");
+    	emptyYarn.swap(ball);
+    	assertEquals(0, ball.getSize());
+    	assertEquals(1, emptyYarn.getSize());
+    	
         LinkedYarn y1 = new LinkedYarn();
         y1.insert("dup");
         y1.insert("dup");
@@ -299,7 +339,6 @@ public class LinkedYarnTests {
         y1.swap(y2);
         assertTrue(y1.contains("yo"));
         assertTrue(y1.contains("sup"));
-        //System.out.println(y2.getUniqueSize());
         assertTrue(y2.contains("dup"));
         assertTrue(y2.contains("unique"));
         assertFalse(y1.contains("dup"));
@@ -313,12 +352,24 @@ public class LinkedYarnTests {
         assertFalse(notCopy.contains("yo"));
         notCopy.swap(copyCopy);
         assertFalse(copyCopy.contains("yo"));
+        
+        LinkedYarn bigBall = new LinkedYarn();
+        for (int i = 0; i < 50; i++) {
+        	bigBall.insert("hello");
+        }
+        bigBall.swap(ball);
+        assertTrue(bigBall.isEmpty());
+        assertEquals(50, ball.getSize());
     }
 
     // Static Method Tests
     // -------------------------------------------------
     @Test
     public void testKnit() {
+    	LinkedYarn emptyYarn = new LinkedYarn();
+    	LinkedYarn stillEmpty = LinkedYarn.knit(emptyYarn, ball);
+    	assertEquals(0, stillEmpty.getSize());
+    	
         LinkedYarn y1 = new LinkedYarn();
         y1.insert("dup");
         y1.insert("dup");
@@ -333,6 +384,8 @@ public class LinkedYarnTests {
         y3.insert("test");
         assertFalse(y1.contains("test"));
         assertFalse(y2.contains("test"));
+        
+        assertEquals(6, y3.getSize());
         
         LinkedYarn minecraft = new LinkedYarn();
         minecraft.insert("creeper");
@@ -352,6 +405,16 @@ public class LinkedYarnTests {
 
     @Test
     public void testTear() {
+    	LinkedYarn notEmptyYarn = new LinkedYarn();
+    	notEmptyYarn.insert("not_empty");
+    	LinkedYarn emptyYarn = LinkedYarn.tear(ball, notEmptyYarn);
+    	assertTrue(emptyYarn.isEmpty());
+    	assertEquals(0, emptyYarn.getSize());
+    	
+    	notEmptyYarn = LinkedYarn.tear(notEmptyYarn, emptyYarn);
+    	assertFalse(notEmptyYarn.isEmpty());
+    	assertEquals(1, notEmptyYarn.getSize());
+    	
         LinkedYarn y1 = new LinkedYarn();
         y1.insert("dup");
         y1.insert("dup");
@@ -366,6 +429,9 @@ public class LinkedYarnTests {
         y3.insert("test");
         assertFalse(y1.contains("test"));
         assertFalse(y2.contains("test"));
+        
+        assertEquals(3, y1.getSize());
+        assertEquals(2, y2.getSize());
         
         LinkedYarn differentYarn = new LinkedYarn();
         differentYarn.insert("different");
@@ -398,6 +464,9 @@ public class LinkedYarnTests {
 
     @Test
     public void testSameYarn() {
+    	LinkedYarn emptyYarn = new LinkedYarn();
+    	assertTrue(LinkedYarn.sameYarn(emptyYarn, ball));
+    	
         LinkedYarn y1 = new LinkedYarn();
         y1.insert("dup");
         y1.insert("dup");
