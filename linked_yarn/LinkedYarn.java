@@ -170,7 +170,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     }
     
     public static boolean sameYarn (LinkedYarn y1, LinkedYarn y2) {
-        return tear(y1, y2).isEmpty() && tear(y2, y1).isEmpty();//Thanks professor Forney!
+        return LinkedYarn.tear(y1, y2).isEmpty() && LinkedYarn.tear(y2, y1).isEmpty();//Thanks professor Forney!
     }
     
     // -----------------------------------------------------------
