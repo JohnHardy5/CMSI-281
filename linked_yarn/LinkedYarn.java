@@ -1,6 +1,9 @@
 package linked_yarn;
 
 import java.util.NoSuchElementException;
+/*
+ * Completed by John Hardy
+ */
 
 public class LinkedYarn implements LinkedYarnInterface {
 
@@ -167,16 +170,7 @@ public class LinkedYarn implements LinkedYarnInterface {
     }
     
     public static boolean sameYarn (LinkedYarn y1, LinkedYarn y2) {
-    	//Quickly determine sameness with few calculations.
-    	if ((y1.size != y2.size) || (y1.uniqueSize != y2.uniqueSize) || (y1.isEmpty() != y2.isEmpty())) {return false;}
-        Node currentNode = y1.head;
-        while (currentNode != null) {
-        	if ((!y2.contains(currentNode.text)) || (y2.count(currentNode.text) != currentNode.count)) {
-        		return false;
-        	}
-        	currentNode = currentNode.next;
-        }
-        return true;
+        return tear(y1, y2).isEmpty() && tear(y2, y1).isEmpty();//Thanks professor Forney!
     }
     
     // -----------------------------------------------------------
