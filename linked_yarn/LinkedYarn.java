@@ -256,11 +256,9 @@ public class LinkedYarn implements LinkedYarnInterface {
         }
 
         public void next () {
-            if (!hasNext()) {
-            	throw new NoSuchElementException();
-            } else if (!isValid()) {
-            	throw new IllegalStateException();
-            } else if (currCount < current.count) {
+            if (!isValid()) throw new IllegalStateException();
+            if (!hasNext()) throw new NoSuchElementException();
+            if (currCount < current.count) {
             	currCount++;
             } else {
             	current = current.next;
@@ -269,11 +267,9 @@ public class LinkedYarn implements LinkedYarnInterface {
         }
         
         public void prev () {
-            if (!hasPrev()) {
-            	throw new NoSuchElementException();
-            } else if (!isValid()) {
-            	throw new IllegalStateException();
-            } else if (currCount > 1) {
+        	if (!isValid()) throw new IllegalStateException();
+        	if (!hasPrev()) throw new NoSuchElementException(); 
+        	if (currCount > 1) {
             	currCount--;
             } else {
             	current = current.prev;
@@ -282,9 +278,16 @@ public class LinkedYarn implements LinkedYarnInterface {
         }
         
         public void replaceAll (String toReplaceWith) {
-            current.text = toReplaceWith;
             itModCount += current.count;
             owner.modCount += current.count;
+        	Node toAddTo = findFirstNodeWith(toReplaceWith);
+        	if (toAddTo != null && toAddTo != current) {
+        		int countToAdd = current.count;
+        		destroyNode(current);
+        		toAddTo.count += countToAdd;
+        	} else {
+        		current.text = toReplaceWith;
+        	}
         }
     }
     
