@@ -55,7 +55,7 @@ package tree.heap;
       public ArrayList<Integer> getSortedElements () {
           ArrayList<Integer> result = (ArrayList<Integer>) heap.clone();
           int count = result.size() - 1;
-          while(count > 1) {
+          while(count > 0) {
               Integer temp = result.get(count);
         	  result.set(count, result.get(0));
               result.set(0, temp);
@@ -71,7 +71,7 @@ package tree.heap;
       //Replaces the root with its greatest child recursively
       private void reheapify (ArrayList<Integer> reheap, int index, int count) {
     	  int greatestChild = findGreatestChild(reheap, index, count);
-    	  bubbleUp(greatestChild);
+    	  percolateUp(greatestChild, reheap);
     	  if (greatestChild < count) {//if the greatest child did not exist, stop reheapifying
     		  reheapify(reheap, greatestChild, count);
     	  }
@@ -90,4 +90,18 @@ package tree.heap;
     	  }
     	  return greatestChild;
       }
-  }
+      
+      private void percolateUp (int index, ArrayList<Integer> reheap) {
+              if (index == 0) {return;}
+      
+              int parent = getParent(index);
+      
+              if (reheap.get(parent) < reheap.get(index)) {
+                  Integer temp = reheap.get(index);
+                  reheap.set(index, reheap.get(parent));
+                  reheap.set(parent, temp);
+                  percolateUp(parent, reheap);
+              }
+      
+      }
+}
