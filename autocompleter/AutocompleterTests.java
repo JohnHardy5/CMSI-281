@@ -39,23 +39,43 @@ public class AutocompleterTests {
     @Test
     public void testAutocompleter() {
         assertTrue(ac.isEmpty());
+        ac.addTerm("is");
+        assertFalse(ac.isEmpty());
     }
 
     // Basic Tests
     // -------------------------------------------------
     @Test
     public void testAddTerm() {
+        assertTrue(ac.isEmpty());
         ac.addTerm("is");
+        assertFalse(ac.isEmpty());
+        ac.addTerm("it");
         ac.addTerm("it");
         ac.addTerm("as");
         ac.addTerm("ass");
         ac.addTerm("at");
         ac.addTerm("bat");
     }
+    
+    @Test
+    public void testAddTermHasTerm() {
+    	assertFalse(ac.hasTerm("empty"));
+    	ac.addTerm("likely");
+    	assertFalse(ac.hasTerm("lit"));
+    	ac.addTerm("lit");
+    	assertTrue(ac.hasTerm("lit"));
+    	ac.addTerm("litter");
+    	assertTrue(ac.hasTerm("litter"));
+    	assertFalse(ac.hasTerm("litt"));
+    	ac.addTerm("like");
+    	assertTrue(ac.hasTerm("like"));
+    }
 
     @Test
     public void testHasTerm() {
         ac.addTerm("is");
+        ac.addTerm("it");
         ac.addTerm("it");
         ac.addTerm("as");
         ac.addTerm("ass");
