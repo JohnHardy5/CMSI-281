@@ -41,41 +41,13 @@ public class Autocompleter implements AutocompleterInterface {
     }
     
     public String getSuggestedTerm (String query) {
-    	System.out.println("Current query: " +query);
-    	query = normalizeTerm(query);    	
-    	char[] charArr = query.toCharArray();
-        if (!findNext(charArr, 0, root, true)) {return null;}//ensure that the prefix exists
-    	TTNode current = root;
-    	int position = 0;
-    	while (position < charArr.length) {//iterate current into position
-    		System.out.println("Position: " +position);
-    		if (current != null) {System.out.println("Current: " + current.letter);} else {System.out.println(current);}
-    		if (current.right != null) {System.out.println("Current.right: " + current.right.letter);}
-    		int comparison = compareChars(charArr[position], current.letter);
-    		if (comparison == 0) {
-    			position++;
-    			if (position < charArr.length) {
-    				System.out.println("Going mid!");
-    				current = current.mid;
-    			}
-    		} else if (comparison < 0) {
-    	    	System.out.println("Going left!");
-    			current = current.left;
-    		} else {
-    			System.out.println("Going right!, new current: " + current);
-    			current = current.right;
-    		}
-    	}
-        ArrayList<Character> arrList = new ArrayList<Character>();
-        for(char c : charArr) {//create arrList and add to it
-            arrList.add(c);
-        }
-        arrList = suggestNext(current, arrList, -1);
-        char[] chars = new char[arrList.size()];
-        for (int i = 0; i < chars.length; i++) {
-        	chars[i] = arrList.get(i);
-        }
-        return new String(chars);
+    	System.out.println("Current query: " + query);
+    	char[] charArr = normalizeTerm(query).toCharArray();
+        //if (!findNext(charArr, 0, root, true)) {return null;}
+    	TTNode current = advanceTo(charArr);
+    	if (current == null) {return null;}//ensure that the prefix exists
+        charArr = suggestNext(current, charArr, -1);
+        return new String(charArr);
     }
     
     public ArrayList<String> getSortedTerms () {
@@ -152,34 +124,88 @@ public class Autocompleter implements AutocompleterInterface {
     	return findNext (charArr, p, current.right, findPrefix);
     }
     
-    private ArrayList<Character> suggestNext (TTNode current, ArrayList<Character> arr, int best) {
-    	if (arr.size() > best && best != -1) {return arr;}
+    private char[] suggestNext (TTNode current, char[] arr, int best) {
+    	System.out.println("current value: " + current.letter);
+    	if (arr.length > best && best != -1) {return arr;}
     	if (current.wordEnd) {
-        	if (best == -1) {
-        		best = arr.size();
+        	if (arr.length < best || best == -1) {
+        		best = arr.length;
         	}
+        	System.out.println("Found end of word: " + new String(arr));
     		return arr;
     	}
-    	ArrayList<Character> mid = arr, left = arr, right = arr;
+    	char[] mid = new char[0], left = new char[0], right = new char[0];
     	if (current.mid != null) {
-    		arr.add(current.mid.letter);
-    		mid = suggestNext(current.mid, arr, best);
+    		mid = suggestNext(current.mid, addLetter(arr, current.mid.letter), best);
     	}
     	if (current.left != null) {
-    		arr.add(current.left.letter);
+    		arr[arr.length - 1] = current.left.letter;
     		left = suggestNext(current.left, arr, best);
     	}
     	if (current.right != null) {
-    		arr.add(current.right.letter);
+    		System.out.print("Going right: " + new String(arr));
+    		arr[arr.length - 1] = current.right.letter;
+    		System.out.println(" -> " + new String(arr));
     		right = suggestNext(current.right, arr, best);
     	}
-    	ArrayList<Character> winner = mid.size() < left.size() ? mid : left;
-    	winner = winner.size() < right.size() ? winner : right;
+    	char[] winner = arr;
+    	if ((mid.length <= left.length && mid.length != 0) || left.length == 0) {
+    		winner = mid;
+    	} else if (left.length != 0) {
+    		winner = left;
+    	}
+    	if ((right.length <= winner.length || winner == arr) && right.length != 0) {
+    		winner = right;
+    	}//if mid, left, and right are empty, use arr
+    	System.out.println("Found a winner: " + new String(winner));
     	return winner;
     }
     
     private boolean isLast (int index, char[] arr) {
     	return index == arr.length - 1;
+    }
+    
+    private char[] addLetter (char[] arr, char letter) {
+    	char[] result = new char[arr.length + 1];
+    	for (int i = 0; i < arr.length; i++) {
+    		result[i] = arr[i];
+    	}
+    	result[result.length - 1] = letter;
+    	return result;
+    }
+    
+    /*
+     * Advances node from root to last item given in query.
+     * Returns null if unable to do so.
+     */
+    private TTNode advanceTo (char[] query) {
+    	TTNode current = root;
+    	int position = 0;
+    	while (position < query.length) {//iterate current into position
+    		//System.out.println("Position: " + position);
+    		//if (current != null) {System.out.println("Current: " + current.letter);} else {System.out.println(current);}
+    		//if (current.right != null) {System.out.println("Current.right: " + current.right.letter);}
+    		//if (current.left != null) {System.out.println("Current.left: " + current.left.letter);}
+    		int comparison = compareChars(query[position], current.letter);
+    		if (comparison == 0) {
+    			position++;
+    			if (position < query.length) {
+    				if (current.mid == null) {return null;}
+    				//System.out.println("Going mid!");
+    				current = current.mid;
+    			}
+    		} else if (comparison < 0) {
+    			if (current.left == null) {return null;}
+    	    	//System.out.println("Going left!, new current: " + current);
+    			current = current.left;
+    		} else {
+    			if (current.right == null) {return null;}
+    			//System.out.println("Going right!, new current: " + current);
+    			current = current.right;
+    		}
+    	}
+    	//System.out.println("Done advancing the current node!");
+    	return current;
     }
     
     // -----------------------------------------------------------
