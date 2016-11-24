@@ -47,9 +47,12 @@ public class AutocompleterTests {
     // -------------------------------------------------
     @Test
     public void testAddTerm() {
+    	try {ac.addTerm("");} catch (IllegalArgumentException e) {System.out.println("addTerm for empty string fails.");}
+    	try {ac.addTerm(null);} catch (IllegalArgumentException e) {System.out.println("addTerm for null fails.");}
         assertTrue(ac.isEmpty());
-        ac.addTerm("is");
+        ac.addTerm("i");
         assertFalse(ac.isEmpty());
+        ac.addTerm("is");
         ac.addTerm("it");
         ac.addTerm("it");
         ac.addTerm("as");
@@ -62,7 +65,7 @@ public class AutocompleterTests {
     public void testAddTermHasTerm() {
     	assertFalse(ac.hasTerm("empty"));
     	ac.addTerm("likely");
-    	assertFalse(ac.hasTerm("lit"));
+    	assertFalse(ac.hasTerm("lik"));
     	ac.addTerm("lit");
     	assertTrue(ac.hasTerm("lit"));
     	ac.addTerm("litter");
@@ -74,6 +77,10 @@ public class AutocompleterTests {
 
     @Test
     public void testHasTerm() {
+    	try {ac.hasTerm("");} catch (IllegalArgumentException e) {System.out.println("hasTerm for empty string fails.");}
+    	try {ac.hasTerm(null);} catch (IllegalArgumentException e) {System.out.println("hasTerm for null fails.");}
+    	assertFalse(ac.hasTerm("empty"));
+    	assertTrue(ac.isEmpty());
         ac.addTerm("is");
         ac.addTerm("it");
         ac.addTerm("it");
@@ -90,10 +97,17 @@ public class AutocompleterTests {
         assertFalse(ac.hasTerm("ii"));
         assertFalse(ac.hasTerm("i"));
         assertFalse(ac.hasTerm("zoo"));
+    	assertFalse(ac.isEmpty());
     }
 
     @Test
     public void getSuggestedTerm() {
+    	try {ac.getSuggestedTerm("");} catch (IllegalArgumentException e) {System.out.println("getSuggested for empty string fails.");}
+    	try {ac.getSuggestedTerm(null);} catch (IllegalArgumentException e) {System.out.println("getSuggested for null fails.");}
+    	assertEquals(null, ac.getSuggestedTerm("empty"));
+    	ac.addTerm("a");
+    	assertEquals(null, ac.getSuggestedTerm("i"));
+    	assertEquals("a", ac.getSuggestedTerm("a"));
         ac.addTerm("is");
         ac.addTerm("it");
         ac.addTerm("as");
@@ -104,6 +118,8 @@ public class AutocompleterTests {
         ac.addTerm("bother");
         ac.addTerm("goat");
         ac.addTerm("goad");
+        assertEquals("is", ac.getSuggestedTerm("is"));
+        ac.addTerm("it");
         assertEquals("is", ac.getSuggestedTerm("is"));
         assertEquals("it", ac.getSuggestedTerm("it"));
         assertEquals("item", ac.getSuggestedTerm("ite"));
@@ -118,7 +134,11 @@ public class AutocompleterTests {
     
     @Test
     public void getSortedTerms() {
+    	assertEquals(new ArrayList<String>(), ac.getSortedTerms());
+    	assertTrue(ac.isEmpty());
         ac.addTerm("is");
+        ArrayList<String> oneWord = new ArrayList<String>(Arrays.asList("is"));
+        assertEquals(oneWord, ac.getSortedTerms());
         ac.addTerm("it");
         ac.addTerm("as");
         ac.addTerm("itenerary");
@@ -131,6 +151,8 @@ public class AutocompleterTests {
             "as", "ass", "at", "bat", "bother", "is", "it", "itenerary", "zoo"
         ));
         assertEquals(solution, ac.getSortedTerms());
+        ac.addTerm("bother");
+        ac.addTerm("it");
+        assertEquals(solution, ac.getSortedTerms());
     }
-    
 }

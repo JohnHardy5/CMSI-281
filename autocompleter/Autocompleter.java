@@ -7,8 +7,7 @@ public class Autocompleter implements AutocompleterInterface {
     // -----------------------------------------------------------
     // Fields
     // -----------------------------------------------------------
-    TTNode root;
-    
+    TTNode root; 
     
     // -----------------------------------------------------------
     // Constructor
@@ -16,7 +15,6 @@ public class Autocompleter implements AutocompleterInterface {
     Autocompleter () {
         root = null;
     }
-    
 
     // -----------------------------------------------------------
     // Methods
@@ -29,29 +27,26 @@ public class Autocompleter implements AutocompleterInterface {
     public void addTerm (String toAdd) {
         char[] charArr = normalizeTerm(toAdd).toCharArray();
         if (isEmpty()) {
-        	root = new TTNode(charArr[0], isLast(0, charArr));
-        	if (isLast(0, charArr)) {return;}
+        	root = new TTNode(charArr[0], isLast(charArr, 0));
         }
         insertNext(charArr, 0, root);
     }
     
     public boolean hasTerm (String query) {
         char[] charArr = normalizeTerm(query).toCharArray();
-        return findNext(charArr, 0, root, false);
+        return findNext(charArr, root, 0);
     }
     
     public String getSuggestedTerm (String query) {
-    	System.out.println("Current query: " + query);
     	char[] charArr = normalizeTerm(query).toCharArray();
-        //if (!findNext(charArr, 0, root, true)) {return null;}
     	TTNode current = advanceTo(charArr);
     	if (current == null) {return null;}//ensure that the prefix exists
-        charArr = suggestNext(current, charArr, -1);
-        return new String(charArr);
+        return new String(suggestNext(charArr, current));
     }
     
     public ArrayList<String> getSortedTerms () {
-        throw new UnsupportedOperationException();
+    	if (root == null) {return new ArrayList<String>();}
+        return sortNext(addLetter(new char[0], root.letter), root, new ArrayList<String>());
     }
     
     
@@ -81,130 +76,140 @@ public class Autocompleter implements AutocompleterInterface {
     
     private void insertNext (char[] charArr, int p, TTNode current) {
 		int comparison = compareChars(charArr[p], current.letter);
-		if (comparison == 0) {//char is equal to current
-			if (isLast(p, charArr)) {
+		if (comparison == 0) {
+			if (isLast(charArr, p)) {
 				current.wordEnd = true;//possible word inside a word
 				return;
 			}
 			if (current.mid == null) {
-				current.mid = new TTNode (charArr[p + 1], isLast(p, charArr));
+				current.mid = new TTNode (charArr[p + 1], isLast(charArr, p));
 			}
 			insertNext(charArr, p + 1, current.mid);
-		} else if (comparison < 0) {//char is less than current
+		} else if (comparison < 0) {
 			if (current.left == null) {
-				current.left = new TTNode (charArr[p], isLast(p, charArr));
-				if (isLast(p, charArr)) {return;}
+				current.left = new TTNode (charArr[p], isLast(charArr, p));
+				if (isLast(charArr, p)) {return;}
 			}
 			insertNext(charArr, p, current.left);
-		} else {//otherwise char is greater than current
+		} else {
 			if (current.right == null) {
-				current.right = new TTNode (charArr[p], isLast(p, charArr));
-				if (isLast(p, charArr)) {return;}
+				current.right = new TTNode (charArr[p], isLast(charArr, p));
+				if (isLast(charArr, p)) {return;}
 			}
 			insertNext(charArr, p, current.right);
 		}
 	}
     
-    private boolean findNext (char[] charArr, int p, TTNode current, boolean findPrefix) {
+    private boolean findNext (char[] charArr,TTNode current, int p) {
     	if (current == null) {return false;}
     	int comparison = compareChars(charArr[p], current.letter);
     	if (comparison == 0) {
-    		if (isLast(p, charArr)) {
-    			if (findPrefix) {
-    				return true;
-    			} else {
-    				return current.wordEnd;
-    			}
-    		}
-    		return findNext (charArr, p + 1, current.mid, findPrefix);
+    		if (isLast(charArr, p)) {return current.wordEnd;}
+    		return findNext (charArr, current.mid, p + 1);
     	}
     	if (comparison < 0) {
-    		return findNext (charArr, p, current.left, findPrefix);
+    		return findNext (charArr, current.left, p);
     	}
-    	return findNext (charArr, p, current.right, findPrefix);
+    	return findNext (charArr, current.right, p);
     }
     
-    private char[] suggestNext (TTNode current, char[] arr, int best) {
-    	System.out.println("current value: " + current.letter);
-    	if (arr.length > best && best != -1) {return arr;}
-    	if (current.wordEnd) {
-        	if (arr.length < best || best == -1) {
-        		best = arr.length;
-        	}
-        	System.out.println("Found end of word: " + new String(arr));
-    		return arr;
-    	}
+    private char[] suggestNext (char[] charArr, TTNode current) {
+    	if (current.wordEnd) {return charArr;}
     	char[] mid = new char[0], left = new char[0], right = new char[0];
     	if (current.mid != null) {
-    		mid = suggestNext(current.mid, addLetter(arr, current.mid.letter), best);
+    		mid = suggestNext(addLetter(charArr, current.mid.letter), current.mid);
     	}
     	if (current.left != null) {
-    		arr[arr.length - 1] = current.left.letter;
-    		left = suggestNext(current.left, arr, best);
+    		left = suggestNext(setLastLetter(charArr, current.left.letter), current.left);
     	}
     	if (current.right != null) {
-    		System.out.print("Going right: " + new String(arr));
-    		arr[arr.length - 1] = current.right.letter;
-    		System.out.println(" -> " + new String(arr));
-    		right = suggestNext(current.right, arr, best);
+    		right = suggestNext(setLastLetter(charArr, current.right.letter), current.right);
     	}
-    	char[] winner = arr;
+    	return getSmallest(mid, left, right, charArr);
+    }
+    
+    /*
+     * Returns the smallest of the three char arrays, ignoring empty ones.
+     * Returns the original if all are empty.
+     */
+    private char[] getSmallest(char[] mid, char[] left, char[] right, char[] original) {
+    	char[] winner = original;
     	if ((mid.length <= left.length && mid.length != 0) || left.length == 0) {
     		winner = mid;
     	} else if (left.length != 0) {
     		winner = left;
     	}
-    	if ((right.length <= winner.length || winner == arr) && right.length != 0) {
+    	if ((right.length <= winner.length || winner == original) && right.length != 0) {
     		winner = right;
-    	}//if mid, left, and right are empty, use arr
-    	System.out.println("Found a winner: " + new String(winner));
+    	}
     	return winner;
     }
     
-    private boolean isLast (int index, char[] arr) {
-    	return index == arr.length - 1;
+    private ArrayList<String> sortNext (char[] charArr, TTNode current, ArrayList<String> result) {
+    	if (current.left != null) {
+    		sortNext(setLastLetter(charArr, current.left.letter), current.left, result);
+    	}
+    	if (current.wordEnd) {
+    		result.add(new String(charArr));
+    	}
+    	if (current.mid != null) {
+    		sortNext(addLetter(charArr, current.mid.letter), current.mid, result);
+    	}
+    	if (current.right != null) {
+    		sortNext(setLastLetter(charArr, current.right.letter), current.right, result);
+    	}
+    	return result;
     }
     
-    private char[] addLetter (char[] arr, char letter) {
-    	char[] result = new char[arr.length + 1];
-    	for (int i = 0; i < arr.length; i++) {
-    		result[i] = arr[i];
+    /*
+     * Returns a copy of given charArr with last letter set to given char.
+     */
+    private char[] setLastLetter (char[] charArr, char newLastLetter) {
+		char[] clone = charArr.clone();
+		clone[clone.length -1] = newLastLetter;
+    	return clone;
+    }
+    
+    /*
+     * Returns a copy of given charArr with given letter added to the end.
+     */
+    private char[] addLetter (char[] charArr, char letter) {
+    	char[] result = new char[charArr.length + 1];
+    	for (int i = 0; i < charArr.length; i++) {
+    		result[i] = charArr[i];
     	}
     	result[result.length - 1] = letter;
     	return result;
     }
     
+    private boolean isLast (char[] charArr, int index) {
+    	return index == charArr.length - 1;
+    }
+    
     /*
-     * Advances node from root to last item given in query.
+     * Advances a node from root to last item in given charArr.
      * Returns null if unable to do so.
      */
-    private TTNode advanceTo (char[] query) {
+    private TTNode advanceTo (char[] charArr) {
+    	if (root == null) {return null;}
     	TTNode current = root;
     	int position = 0;
-    	while (position < query.length) {//iterate current into position
-    		//System.out.println("Position: " + position);
-    		//if (current != null) {System.out.println("Current: " + current.letter);} else {System.out.println(current);}
-    		//if (current.right != null) {System.out.println("Current.right: " + current.right.letter);}
-    		//if (current.left != null) {System.out.println("Current.left: " + current.left.letter);}
-    		int comparison = compareChars(query[position], current.letter);
+    	while (position < charArr.length) {
+    		int comparison = compareChars(charArr[position], current.letter);
     		if (comparison == 0) {
-    			position++;
-    			if (position < query.length) {
+				position++;
+    			if (position < charArr.length) {
     				if (current.mid == null) {return null;}
-    				//System.out.println("Going mid!");
     				current = current.mid;
     			}
     		} else if (comparison < 0) {
     			if (current.left == null) {return null;}
-    	    	//System.out.println("Going left!, new current: " + current);
     			current = current.left;
     		} else {
     			if (current.right == null) {return null;}
-    			//System.out.println("Going right!, new current: " + current);
     			current = current.right;
     		}
     	}
-    	//System.out.println("Done advancing the current node!");
     	return current;
     }
     
@@ -213,7 +218,7 @@ public class Autocompleter implements AutocompleterInterface {
     // -----------------------------------------------------------
     
     /*
-     * Internal storage of autocompleter search terms
+     * Internal storage of auto-completer search terms
      * as represented using a Ternary Tree with TTNodes
      */
     private class TTNode {
@@ -229,7 +234,5 @@ public class Autocompleter implements AutocompleterInterface {
             mid     = null;
             right   = null;
         }
-        
-    }
-    
+    } 
 }
