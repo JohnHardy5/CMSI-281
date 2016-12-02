@@ -1,3 +1,4 @@
+package inputSplitter;
 /*
  * Group members: John Hardy, Albert Didde, and Ryan Frizel.
  */
@@ -40,5 +41,6 @@ public class InputSplitter {
 			System.out.println("No individual words found...");
 		}
 		System.out.println("Number of individual words found: " + numIndvWordsFound);
+        input.close();
 	}
 }
