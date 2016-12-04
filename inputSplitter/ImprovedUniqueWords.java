@@ -16,7 +16,7 @@ public class ImprovedUniqueWords {
           Scanner input = new Scanner(System.in);//c1
           System.out.println("Enter a sentence.");//c2
           String[] words = input.nextLine().split(" ");//c3
-          Hashtable<String, Integer> h = new Hashtable<String, Integer>();//c4
+          Hashtable<String, Integer> h = new Hashtable<String, Integer>();//c4 all of 1-4 are O(1)
           for (String s : words) {//n
         	  Integer bucketValue = h.get(s);//c5 * n
         	  if (bucketValue == null) {//c6 * n
@@ -25,9 +25,15 @@ public class ImprovedUniqueWords {
         		  h.put(s, bucketValue + 1);//O(1) * n
         	  }
           }
-          System.out.println("There are " + h.size() + " unique words in that sentence.");//c9
-          input.close();//c10
-      }//T(n) = c1 + c2 + c3 + c4 + c5 * n + c6 * n + O(1) * n + O(1) * n + c9 + c10 = O(n)
+          int count = 0;//c7
+          for (String s : words) {//n
+        	  if (h.get(s) == 1) {//c8 * n
+        		  count++;//worst case: every word is unique, c9 * n
+        	  }
+          }
+          System.out.println("There are " + count + " unique words in that sentence.");//c10
+          input.close();//c11
+      }//T(n) = O(1) + c5 * n + c6 * n + O(1) * n + O(1) * n + c7 + c8 * n + c9 * n + c10 + c11 = O(n)
       
 }
 
