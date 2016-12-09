@@ -34,7 +34,6 @@ public class PhraseHashTests {
     @Test
     public void testPut() {
     	try {p.put(null);} catch (Exception e) {System.out.println("Successful error on null input for put(): " + e);}
-    	try {p.put("");} catch (Exception e) {System.out.println("Successful error on empty input for put(): " + e);}
         p.put("bad");
         p.put("awful");
         p.put("terrible");
@@ -46,10 +45,9 @@ public class PhraseHashTests {
 
     @Test
     public void testGet() {
-    	try {p.get(null);} catch (Exception e) {System.out.println("Successful error on null input for get(): " + e);}
-    	try {p.get("");} catch (Exception e) {System.out.println("Successful error on empty input for get(): " + e);}
-        assertEquals(null, p.get("empty"));
+    	assertEquals(null, p.get("empty"));
         p.put("bad");
+    	try {p.get(null);} catch (Exception e) {System.out.println("Successful error on null input for get(): " + e);}
         assertEquals("bad", p.get("bad"));
         assertEquals(null, p.get("empty"));
         p.put("awful");

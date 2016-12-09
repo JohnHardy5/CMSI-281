@@ -38,40 +38,29 @@ public class PhraseHash implements PhraseHashInterface {
     }
     
     public void put (String s) {
-    	int startPosition = hash(s);
-    	int position = startPosition;
-    	int[] range = getRange(s);
-    	do {
-    		if (buckets[position] == null) {
-    			buckets[position] = new LinkedList<String>();
-    		}
-    		if (buckets[position].contains(s)) {return;}
-    		if (buckets[position].size() < 3) {
-    			buckets[position].add(s);
-    			size++;
-    			longest = longest < getWordCount(s) ? getWordCount(s) : longest;
-    			return;
-    		} else {
-    			position = incrementPos(position, range);
-    		}
-    	} while (position != startPosition);//prevent an infinite loop
+    	int position = forneyHash(s);
+		if (buckets[position] == null) {
+			buckets[position] = new LinkedList<String>();
+		}
+		if (buckets[position].contains(s)) {
+			return;
+		} else {
+			buckets[position].add(s);
+			size++;
+			longest = longest < getWordCount(s) ? getWordCount(s) : longest;
+		}
     }
     
     public String get (String s) {
-    	int startPosition = hash(s);
-    	int position = startPosition;
-    	int[] range = getRange(s);
     	if (isEmpty()) {return null;}
-    	//System.out.println("Current phrase and starting position: " + s + ", " + startPosition);
-    	do {
-    		if (buckets[position] == null || !buckets[position].contains(s)) {
-    			position = incrementPos(position, range);
-    			//System.out.println("Current Position: " + position);
-    		} else {
-    			return s;
-    		}
-    	} while (position != startPosition); //prevent an infinite loop
-    	return null;
+    	int position = forneyHash(s);
+    	//System.out.println("Current phrase: " + s);
+		//System.out.println("Current Position: " + position);
+		if (buckets[position] == null || !buckets[position].contains(s)) {
+	    	return null;
+		} else {
+			return s;
+		}
     }
     
     public int longestLength () {
@@ -84,13 +73,27 @@ public class PhraseHash implements PhraseHashInterface {
     // -----------------------------------------------------------
     
     /*
+     * 'Uniformly' distributes strings by utilizing the unique ascii values
+     * of the given strings and multiplying by a large arbitrary prime value
+     */
+    private int forneyHash (String s) {
+    	int largePrime = 129;//seems good enough
+    	int asciiVal = 0;
+    	for (int i = 0; i < s.length(); i++) {
+    		asciiVal += s.charAt(i);
+    	}
+    	return (asciiVal * largePrime) % BUCKET_COUNT;
+    }
+    
+    /*
      * returns the position of a given key in the bucket array
      * using a hash function that positions the strings based on
      * number of words and the length of the entire string sorted into
      * a neatly organized even distribution
      * throws an error on empty string input
+     * NOTE: Depricated! (See above)
      */
-    private int hash (String s) {
+    /*private int hash (String s) {
         int numLetters = getLetterLength(s);
         if (numLetters == 0) {throw new IllegalArgumentException("Given phrase is empty.");}
         int[] range = getRange(s);
@@ -115,7 +118,7 @@ public class PhraseHash implements PhraseHashInterface {
      * Returns the appropriate range for number of words in the phrase
      * throws an error is phrase is empty string
      */
-    private int[] getRange (String s) {
+    /*private int[] getRange (String s) {
     	int[] range = new int[2];
     	int numWords = getWordCount(s);
         if (numWords == 0) {
@@ -137,7 +140,7 @@ public class PhraseHash implements PhraseHashInterface {
      * returns the total number of letters in a phrase
      * disregarding spaces
      */
-    private int getLetterLength (String s) {
+    /*private int getLetterLength (String s) {
     	String[] words = s.split(" ");
     	int result = 0;
         for (String str : words) {
@@ -157,11 +160,11 @@ public class PhraseHash implements PhraseHashInterface {
      * used to increment the position of our put and get methods
      * wraps back to first point in range if it increments out of range
      */
-    private int incrementPos (int currPos, int[] range) {
+    /*private int incrementPos (int currPos, int[] range) {
     	currPos++;
     	if (currPos > range[1]) {
     		return range[0];
     	}
     	return currPos;
-    }
+    }*/
 }
