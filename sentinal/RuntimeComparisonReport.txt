@@ -1,0 +1,38 @@
+Runtime complexities:
+
+	HashtableInsertion: O(n)
+	HashtableAccess: O(1)
+	
+	LinkedListPrependingInsertion: O(1)
+	LinkedListAppendingInsertion: O(1)
+	LinkedListAccess: O(n)
+	
+	ArrayListPrependingInsertion: O(n)
+	ArrayListAppendingInsertion: O(1)
+	ArrayListAccess: O(1)
+	
+Rationale:
+
+As we had already discussed in class the hashtable access runtime complexity should
+be close to O(1). I chose o(n) for the insertion since we have to do one hash function
+calculation for each item.
+
+For the linked list prepending and appending operations, these are usually pretty
+fast since all we have to do is change around some references. The access time is
+usually O(n) since we have to iterate item by item to get where we need to be.
+
+For array list appending, it should be pretty quick since we are simply adding to the
+end and only need to change the size of the array. However, prepending in an array
+list usually takes O(n) since we have to shift all the items to the right. Because of
+arbitrary access, accessing items in an array list is always O(1)
+
+Runtime:
+
+NOTE: The runtime is given in order of compeletion with the time given as a piece that
+can be added to the previous time.
+
+	append linked list: 0.243s (first one to finish)
+	append array list: 0.061s (that is it finished 0.061s later)
+	prepend linked list: 0.115s
+	hash table: 0.073s
+	prepend array list: 0.080s (last item to finish)
