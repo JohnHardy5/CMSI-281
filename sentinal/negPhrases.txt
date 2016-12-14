@@ -7,4 +7,5 @@ sad
 poorly
 negligent
 not good
+bad job
 sloppy job

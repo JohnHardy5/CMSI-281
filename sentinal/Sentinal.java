@@ -50,34 +50,20 @@ public class Sentinal implements SentinalInterface {
     public String sentinalyze (String filename) throws FileNotFoundException {
     	Scanner fileReader = new Scanner(new File(filename));
     	int largest = posHash.longestLength() > negHash.longestLength() ? posHash.longestLength() : negHash.longestLength();
-    	System.out.println("Largest: " + largest);
-    	int posCount = 0, negCount = 0;
-    	while (fileReader.hasNext()) {
+    	int sentiment = 0;
+    	while (fileReader.hasNextLine()) {
     		String currentLine = fileReader.nextLine();
-    		System.out.println("Current line: " + currentLine);
     		String[] words = currentLine.split(" ");
-    		System.out.println("Number of words: " + words.length);
-    		for (int i = largest; i > 0; i--) {
-    			System.out.println("Value of i: " + i);
-    			for (int j = 0; j < words.length - i; j++) {
-    				System.out.println("Value of j: " + j);
-    				String selection = makeSelection(words, i, j);
-    				if (posHash.get(selection) != null && posHash.get(selection).equals(selection)) {
-    					System.out.println("Adding one to positive count.");
-    					posCount++;
-    				}
-    				if (negHash.get(selection) != null && negHash.get(selection).equals(selection)) {
-    					System.out.println("Adding one to negative count.");
-    					negCount++;
-    				}
-    				
+    		for (int window = largest; window > 0; window--) {
+    			for (int currPos = 0; currPos < words.length - window + 1; currPos++) {//do not iterate outside of 'window'
+    				sentiment += analyzeSelection(words, window, currPos);
     			}
     		}
     	}
     	fileReader.close();
-    	if (posCount > negCount) {
+    	if (sentiment > 0) {
     		return "positive";
-    	} else if (negCount > posCount) {
+    	} else if (sentiment < 0) {
     		return "negative";
     	}
     	return "neutral";
@@ -87,9 +73,18 @@ public class Sentinal implements SentinalInterface {
     // -----------------------------------------------------------
     // Helper Methods
     // -----------------------------------------------------------
-    
-    private int analyzeLine (String[] words ) {
-    	return 0;
+ 
+    private int analyzeSelection (String[] words, int currWindow, int startPos) {
+		String selection = makeSelection(words, currWindow, startPos);
+		int sentiment = 0;
+		if (posHash.get(selection) != null && posHash.get(selection).equals(selection)) {
+			deleteSelection(words, currWindow, startPos);
+			sentiment++;
+		} else if (negHash.get(selection) != null && negHash.get(selection).equals(selection)) {
+			deleteSelection(words, currWindow, startPos);
+			sentiment--;
+		}
+    	return sentiment;
     } 
     
     private String makeSelection (String[] words, int selectionSize, int startPos) {
@@ -97,9 +92,13 @@ public class Sentinal implements SentinalInterface {
 		for (int i = 1; i < selectionSize; i++) {
 			selection = selection + " " + words[startPos + i];
 		}
-		//System.out.println("Selection: " + selection);
 		return selection;
     }
     
+    private void deleteSelection (String[] words, int currWindow, int startPos) {
+    	for (int i = startPos; i < startPos + currWindow; i++) {
+    		words[i] = "";
+    	}
+    }
+    
 }
-

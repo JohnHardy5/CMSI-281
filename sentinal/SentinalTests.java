@@ -85,5 +85,14 @@ public class SentinalTests {
             fail();
         }
     }
+    
+    @Test
+    public void testSentinalyze_5()	{
+        try {
+            assertEquals("neutral", s.sentinalyze(absolutePath + "emptyDoc.txt"));
+        } catch (FileNotFoundException e) {
+            fail();
+        }
+    }
 
 }

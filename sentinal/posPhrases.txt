@@ -1,3 +1,4 @@
+well
 good
 excellent
 superb
@@ -5,5 +6,6 @@ terrific
 awesome
 positive
 great job
+good job
 well done
 superior work
